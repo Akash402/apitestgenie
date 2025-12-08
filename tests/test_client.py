@@ -1,5 +1,5 @@
-from apitestgenie.client import ApiClient
-from apitestgenie.simple import get
+from src.apitestgenie.client import ApiClient
+from src.apitestgenie.simple import get
 
 def test_client_mode_get():
     api = ApiClient("https://jsonplaceholder.typicode.com")
