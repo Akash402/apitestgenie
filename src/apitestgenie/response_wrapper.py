@@ -17,12 +17,20 @@ class ResponseWrapper:
 
     def assert_json_key(self, key: str):
         data = self.json()
+        if not isinstance(data, dict):
+            raise AssertionError(
+                f"Expected a JSON object to check key '{key}', but got {type(data).__name__}"
+            )
         if key not in data:
             raise AssertionError(f"Expected key '{key}' not found in JSON response")
         return self
 
     def assert_json_value(self, key: str, expected_value):
         data = self.json()
+        if not isinstance(data, dict):
+            raise AssertionError(
+                f"Expected a JSON object to check key '{key}', but got {type(data).__name__}"
+            )
         if key not in data:
             raise AssertionError(f"Key '{key}' not found in JSON response")
 

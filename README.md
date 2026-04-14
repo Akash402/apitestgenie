@@ -28,7 +28,7 @@ Version 1.0 intentionally avoids heavy features like logging frameworks, async s
 Clone the repository:
 
 ```
-git clone https://github.com/<yourname>/apitestgenie.git
+git clone https://github.com/Akash402/apitestgenie.git
 cd apitestgenie
 ```
 
@@ -190,4 +190,4 @@ Excluded:
 
 ## License
 
-Add your license here (MIT recommended).
+MIT License. See [LICENSE](LICENSE) for details.

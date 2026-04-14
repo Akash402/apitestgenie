@@ -62,3 +62,12 @@ class ApiClient:
     def delete(self, path, retries=0, retry_delay=0, retry_on_status=None, **kwargs):
         url = self._build_url(path)
         return self._request_with_retry("DELETE", url, retries, retry_delay, retry_on_status, **kwargs)
+
+    def close(self):
+        self.session.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
