@@ -11,3 +11,4 @@ src/apitestgenie.egg-info/dependency_links.txt
 src/apitestgenie.egg-info/requires.txt
 src/apitestgenie.egg-info/top_level.txt
 tests/test_client.py
+tests/test_v11.py

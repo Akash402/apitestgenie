@@ -9,7 +9,7 @@ description = "A lightweight, developer-friendly Python library for API test aut
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Akash", github = "Akash402" }
+    { name = "Akash" }
 ]
 keywords = ["api", "testing", "http", "automation", "rest", "assertions", "pytest"]
 classifiers = [

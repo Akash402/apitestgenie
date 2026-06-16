@@ -2,3 +2,6 @@ httpx>=0.27
 
 [dev]
 pytest>=9.0
+
+[schema]
+jsonschema>=4.0
