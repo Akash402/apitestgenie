@@ -1,7 +1,6 @@
 # APItestGenie
 
 APItestGenie is a lightweight, developer-friendly Python library designed to simplify API testing for automation engineers.
-Version 1.0 focuses on clarity, correctness, and essential functionality without unnecessary complexity.
 
 ---
 
@@ -10,16 +9,16 @@ Version 1.0 focuses on clarity, correctness, and essential functionality without
 APItestGenie provides:
 
 - Two ways to perform API requests: Client mode and Simple mode
-- Built-in JSON assertions
-- JSON path assertions for nested responses
-- Basic retry logic with retries, retry delay, and retry_on_status
-- A ResponseWrapper abstraction for consistent behavior across requests
-- GET, POST, PUT, PATCH, DELETE support
+- Built-in JSON assertions and JSON path assertions for nested responses
+- Header assertions
+- Response time assertions
+- JSON schema validation (optional)
+- Retry logic with fixed or exponential backoff delay
+- Optional request logging
+- GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS support
 - Timeout and headers support
 - A complete pytest suite
 - A modern Python packaging layout using the src structure
-
-Version 1.0 intentionally avoids heavy features like logging frameworks, async support, or automation framework integrations.
 
 ---
 
@@ -49,6 +48,12 @@ pip install httpx pytest
 
 ```
 pip install -e .
+```
+
+For JSON schema validation support:
+
+```
+pip install apitestgenie[schema]
 ```
 
 ---
@@ -88,6 +93,16 @@ resp = api.delete("/posts/1")
 resp.assert_status(200)
 ```
 
+HEAD and OPTIONS example:
+
+```python
+resp = api.head("/posts/1")
+resp.assert_status(200)
+
+resp = api.options("/posts/1")
+assert resp.status_code in (200, 204)
+```
+
 ---
 
 ### Simple Mode
@@ -107,6 +122,18 @@ from apitestgenie.simple import post
 
 resp = post("https://jsonplaceholder.typicode.com/posts", json={"hello": "world"})
 resp.assert_status(201)
+```
+
+HEAD and OPTIONS example:
+
+```python
+from apitestgenie.simple import head, options
+
+resp = head("https://jsonplaceholder.typicode.com/posts/1")
+resp.assert_status(200)
+
+resp = options("https://jsonplaceholder.typicode.com/posts/1")
+assert resp.status_code in (200, 204)
 ```
 
 Retry and timeout example:
@@ -129,8 +156,99 @@ resp = get(
 resp.assert_status(200)
 resp.assert_json_key("id")
 resp.assert_json_value("id", 1)
-resp.assert_json_path_exists("title")
-resp.assert_json_path_value("id", 1)
+resp.assert_json_path_exists("user.address.city")
+resp.assert_json_path_value("user.address.city", "London")
+```
+
+---
+
+## Header Assertions
+
+```python
+resp.assert_header("content-type")
+resp.assert_header_value("content-type", "application/json")
+```
+
+Header name matching is case-insensitive.
+
+---
+
+## Response Time Assertion
+
+```python
+resp.assert_response_time(2.0)  # fails if response took more than 2 seconds
+```
+
+---
+
+## JSON Schema Validation
+
+Requires `jsonschema` (`pip install apitestgenie[schema]`):
+
+```python
+schema = {
+    "type": "object",
+    "properties": {
+        "id": {"type": "integer"},
+        "title": {"type": "string"}
+    },
+    "required": ["id"]
+}
+resp.assert_json_schema(schema)
+```
+
+---
+
+## Retry with Exponential Backoff
+
+```python
+resp = api.get(
+    "/posts/1",
+    retries=3,
+    retry_delay=1,
+    retry_on_status=[503],
+    retry_backoff=True   # sleeps 2s, 4s, 8s between retries
+)
+```
+
+Without `retry_backoff=True` (default), the delay is fixed at `retry_delay` seconds.
+
+---
+
+## Logging
+
+Pass `logging=True` to emit `INFO`-level log lines for each request (method, URL, status, elapsed):
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+
+api = ApiClient("https://jsonplaceholder.typicode.com", logging=True)
+api.get("/posts/1")
+# INFO apitestgenie: GET https://jsonplaceholder.typicode.com/posts/1 -> 200 (0.123s)
+```
+
+In simple mode:
+
+```python
+get("https://jsonplaceholder.typicode.com/posts/1", logging=True)
+```
+
+Logging is off by default.
+
+---
+
+## Chaining Assertions
+
+All assertion methods return `self`, so they can be chained:
+
+```python
+api.get("/posts/1") \
+    .assert_status(200) \
+    .assert_response_time(2.0) \
+    .assert_header("content-type") \
+    .assert_json_key("id") \
+    .assert_json_value("id", 1)
 ```
 
 ---
@@ -164,27 +282,24 @@ apitestgenie/
 
 ---
 
-## Version 1.0 Scope Summary
+## Changelog
 
-Included:
+### v1.1.0
 
-- CRUD operations
-- Basic retry logic
+- Added `assert_header(name)` and `assert_header_value(name, expected)` to `ResponseWrapper`
+- Added `assert_response_time(max_seconds)` to `ResponseWrapper`
+- Added `assert_json_schema(schema)` to `ResponseWrapper` (requires `jsonschema`)
+- Added `retry_backoff=True` option for exponential backoff on retries
+- Added optional `logging=True` parameter on `ApiClient` and all simple mode functions
+- Added `head()` and `options()` to both `ApiClient` and simple mode
+
+### v1.0.0
+
+- Initial release with GET, POST, PUT, PATCH, DELETE
 - JSON and JSON path assertions
+- Basic retry logic
 - ResponseWrapper abstraction
-- Simple and client modes
-- Header and timeout support
-- Test suite
-- Clean structure
-
-Excluded:
-
-- Advanced retry logic
-- Logging framework
-- Robot/Behave integrations
-- Async support
-- Schema validation
-- Plugin system
+- Client and simple modes
 
 ---
 

@@ -1,13 +1,27 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "apitestgenie"
-version = "1.0.0"
+version = "1.1.0"
 description = "A lightweight, developer-friendly Python library for API test automation"
 readme = "README.md"
 license = { file = "LICENSE" }
+authors = [
+    { name = "Akash", github = "Akash402" }
+]
+keywords = ["api", "testing", "http", "automation", "rest", "assertions", "pytest"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Internet :: WWW/HTTP",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 requires-python = ">=3.11"
 dependencies = [
     "httpx>=0.27",
@@ -17,6 +31,14 @@ dependencies = [
 dev = [
     "pytest>=9.0",
 ]
+schema = [
+    "jsonschema>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Akash402/apitestgenie"
+Repository = "https://github.com/Akash402/apitestgenie"
+"Bug Tracker" = "https://github.com/Akash402/apitestgenie/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

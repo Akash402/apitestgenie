@@ -114,7 +114,7 @@ def test_assert_status_passes():
 
 def test_assert_status_fails():
     resp = _make_mock_response(404, {"error": "not found"})
-    with pytest.raises(AssertionError, match="Expected 200, got 404"):
+    with pytest.raises(AssertionError, match="Expected status 200, got 404"):
         resp.assert_status(200)
 
 
@@ -143,7 +143,7 @@ def test_assert_json_value_passes():
 
 def test_assert_json_value_fails():
     resp = _make_mock_response(200, {"id": 42})
-    with pytest.raises(AssertionError, match="Expected 'id' to be '1', got '42'"):
+    with pytest.raises(AssertionError, match="Expected 'id' to be 1, got 42"):
         resp.assert_json_value("id", 1)
 
 

@@ -1,0 +1,13 @@
+LICENSE
+README.md
+pyproject.toml
+src/apitestgenie/__init__.py
+src/apitestgenie/client.py
+src/apitestgenie/response_wrapper.py
+src/apitestgenie/simple.py
+src/apitestgenie.egg-info/PKG-INFO
+src/apitestgenie.egg-info/SOURCES.txt
+src/apitestgenie.egg-info/dependency_links.txt
+src/apitestgenie.egg-info/requires.txt
+src/apitestgenie.egg-info/top_level.txt
+tests/test_client.py

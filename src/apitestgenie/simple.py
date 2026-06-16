@@ -1,16 +1,25 @@
+import logging as _logging
 import time
+from typing import Any
+
 import httpx
+
 from .response_wrapper import ResponseWrapper
 
+_logger = _logging.getLogger("apitestgenie")
+
+
 def _request_with_retry(
-    method,
-    url,
-    retries=0,
-    retry_delay=0,
-    retry_on_status=None,
-    timeout=None,
-    **kwargs
-):
+    method: str,
+    url: str,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    log_enabled: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
     attempt = 0
 
     while True:
@@ -21,6 +30,10 @@ def _request_with_retry(
                 timeout=timeout,
                 **kwargs
             )
+
+            if log_enabled:
+                elapsed = response.elapsed.total_seconds()
+                _logger.info("%s %s -> %s (%.3fs)", method, url, response.status_code, elapsed)
 
             # If no retry rules → return immediately
             if not retry_on_status:
@@ -35,14 +48,15 @@ def _request_with_retry(
             if attempt > retries:
                 return ResponseWrapper(response)
 
-            # Otherwise retry
-            time.sleep(retry_delay)
+            delay = retry_delay * (2 ** attempt) if retry_backoff else retry_delay
+            time.sleep(delay)
 
         except httpx.RequestError:
             attempt += 1
             if attempt > retries:
                 raise
-            time.sleep(retry_delay)
+            delay = retry_delay * (2 ** attempt) if retry_backoff else retry_delay
+            time.sleep(delay)
 
 
 # --------------------------------------------------------
@@ -50,96 +64,160 @@ def _request_with_retry(
 # --------------------------------------------------------
 
 def get(
-    url,
-    retries=0,
-    retry_delay=0,
-    retry_on_status=None,
-    timeout=None,
-    **kwargs
-):
+    url: str,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
     return _request_with_retry(
         "GET", url,
         retries=retries,
         retry_delay=retry_delay,
         retry_on_status=retry_on_status,
         timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
         **kwargs
     )
 
 
 def post(
-    url,
-    json=None,
-    retries=0,
-    retry_delay=0,
-    retry_on_status=None,
-    timeout=None,
-    **kwargs
-):
+    url: str,
+    json: Any = None,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
     return _request_with_retry(
         "POST", url,
         retries=retries,
         retry_delay=retry_delay,
         retry_on_status=retry_on_status,
         timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
         json=json,
         **kwargs
     )
 
 
 def put(
-    url,
-    json=None,
-    retries=0,
-    retry_delay=0,
-    retry_on_status=None,
-    timeout=None,
-    **kwargs
-):
+    url: str,
+    json: Any = None,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
     return _request_with_retry(
         "PUT", url,
         retries=retries,
         retry_delay=retry_delay,
         retry_on_status=retry_on_status,
         timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
         json=json,
         **kwargs
     )
 
 
 def patch(
-    url,
-    json=None,
-    retries=0,
-    retry_delay=0,
-    retry_on_status=None,
-    timeout=None,
-    **kwargs
-):
+    url: str,
+    json: Any = None,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
     return _request_with_retry(
         "PATCH", url,
         retries=retries,
         retry_delay=retry_delay,
         retry_on_status=retry_on_status,
         timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
         json=json,
         **kwargs
     )
 
 
 def delete(
-    url,
-    retries=0,
-    retry_delay=0,
-    retry_on_status=None,
-    timeout=None,
-    **kwargs
-):
+    url: str,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
     return _request_with_retry(
         "DELETE", url,
         retries=retries,
         retry_delay=retry_delay,
         retry_on_status=retry_on_status,
         timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
+        **kwargs
+    )
+
+
+def head(
+    url: str,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
+    return _request_with_retry(
+        "HEAD", url,
+        retries=retries,
+        retry_delay=retry_delay,
+        retry_on_status=retry_on_status,
+        timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
+        **kwargs
+    )
+
+
+def options(
+    url: str,
+    retries: int = 0,
+    retry_delay: int | float = 0,
+    retry_on_status: list[int] | None = None,
+    timeout: int | float | None = None,
+    retry_backoff: bool = False,
+    logging: bool = False,
+    **kwargs: Any,
+) -> ResponseWrapper:
+    return _request_with_retry(
+        "OPTIONS", url,
+        retries=retries,
+        retry_delay=retry_delay,
+        retry_on_status=retry_on_status,
+        timeout=timeout,
+        retry_backoff=retry_backoff,
+        log_enabled=logging,
         **kwargs
     )
